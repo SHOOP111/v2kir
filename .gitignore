@@ -1,0 +1,7 @@
+target/
+Cargo.lock
+save/
+*.log
+.DS_Store
+.idea/
+.vscode/
