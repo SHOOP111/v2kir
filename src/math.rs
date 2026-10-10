@@ -11,12 +11,19 @@ pub fn clamp_len(v: Vec2, max: f32) -> Vec2 {
 
 pub fn safe_normalize(v: Vec2) -> Vec2 {
     let len = v.length();
-    if len > 0.00001 { v / len } else { Vec2::ZERO }
+    if len > 0.00001 {
+        v / len
+    } else {
+        Vec2::ZERO
+    }
 }
 
 pub fn approach(current: f32, target: f32, max_delta: f32) -> f32 {
-    if (target - current).abs() <= max_delta { target }
-    else { current + (target - current).signum() * max_delta }
+    if (target - current).abs() <= max_delta {
+        target
+    } else {
+        current + (target - current).signum() * max_delta
+    }
 }
 
 pub fn damp(current: Vec2, target: Vec2, rate: f32, dt: f32) -> Vec2 {
@@ -29,9 +36,13 @@ pub fn rotate(v: Vec2, angle: f32) -> Vec2 {
     Vec2::new(v.x * c - v.y * s, v.x * s + v.y * c)
 }
 
-pub fn angle_of(v: Vec2) -> f32 { v.y.atan2(v.x) }
+pub fn angle_of(v: Vec2) -> f32 {
+    v.y.atan2(v.x)
+}
 
-pub fn from_angle(a: f32) -> Vec2 { Vec2::new(a.cos(), a.sin()) }
+pub fn from_angle(a: f32) -> Vec2 {
+    Vec2::new(a.cos(), a.sin())
+}
 
 pub fn circle_hit(a: Vec2, ar: f32, b: Vec2, br: f32) -> bool {
     a.distance_squared(b) <= (ar + br) * (ar + br)
@@ -60,12 +71,20 @@ pub fn hash01(x: i32, y: i32, seed: u64) -> f32 {
     (hash2(x, y, seed) as f32) / (u32::MAX as f32)
 }
 
-pub fn quantize(v: f32, step: f32) -> i32 { (v / step).floor() as i32 }
+pub fn quantize(v: f32, step: f32) -> i32 {
+    (v / step).floor() as i32
+}
 
 pub fn wrap_angle(mut a: f32) -> f32 {
-    while a > std::f32::consts::PI { a -= std::f32::consts::PI * 2.0; }
-    while a < -std::f32::consts::PI { a += std::f32::consts::PI * 2.0; }
+    while a > std::f32::consts::PI {
+        a -= std::f32::consts::PI * 2.0;
+    }
+    while a < -std::f32::consts::PI {
+        a += std::f32::consts::PI * 2.0;
+    }
     a
 }
 
-pub fn lerp_angle(a: f32, b: f32, t: f32) -> f32 { a + wrap_angle(b - a) * t.clamp(0.0, 1.0) }
+pub fn lerp_angle(a: f32, b: f32, t: f32) -> f32 {
+    a + wrap_angle(b - a) * t.clamp(0.0, 1.0)
+}

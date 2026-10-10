@@ -1,15 +1,32 @@
+use crate::constants::SAVE_VERSION;
 use macroquad::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::constants::SAVE_VERSION;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum RunState { Title, Playing, Paused, Dead }
+pub enum RunState {
+    Title,
+    Playing,
+    Paused,
+    Dead,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum EnemyKind { Grunt, Shooter, Dasher, Brute, Warden, Harvester }
+pub enum EnemyKind {
+    Grunt,
+    Shooter,
+    Dasher,
+    Brute,
+    Warden,
+    Harvester,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum WeaponKind { Dawnblade, Repeater, ArcCannon, VoidLance }
+pub enum WeaponKind {
+    Dawnblade,
+    Repeater,
+    ArcCannon,
+    VoidLance,
+}
 
 /// Temporary world-scale modifiers that make each run feel less predictable.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -21,12 +38,8 @@ pub enum RiftEvent {
 }
 
 impl RiftEvent {
-    pub const ALL: [Self; 4] = [
-        Self::BloodMoon,
-        Self::Overcharge,
-        Self::TimeSnare,
-        Self::FortuneFlux,
-    ];
+    pub const ALL: [Self; 4] =
+        [Self::BloodMoon, Self::Overcharge, Self::TimeSnare, Self::FortuneFlux];
 
     pub fn title(self) -> &'static str {
         match self {
@@ -48,7 +61,12 @@ impl RiftEvent {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum PickupKind { Heal, Energy, Xp, Fury }
+pub enum PickupKind {
+    Heal,
+    Energy,
+    Xp,
+    Fury,
+}
 
 #[derive(Clone, Debug)]
 pub struct Player {
@@ -77,10 +95,29 @@ pub struct Player {
 
 impl Default for Player {
     fn default() -> Self {
-        Self { pos: Vec2::ZERO, velocity: Vec2::ZERO, radius: 18.0, hp: 100.0, max_hp: 100.0,
-            energy: 100.0, max_energy: 100.0, fury: 0.0, xp: 0, level: 1, kills: 0, damage_done: 0.0,
-            weapon: WeaponKind::Repeater, fire_timer: 0.0, dash_timer: 0.0, dash_time: 0.0, invulnerable: 0.0,
-            nova_timer: 0.0, overdrive: 0.0, combo: 0, combo_timer: 0.0 }
+        Self {
+            pos: Vec2::ZERO,
+            velocity: Vec2::ZERO,
+            radius: 18.0,
+            hp: 100.0,
+            max_hp: 100.0,
+            energy: 100.0,
+            max_energy: 100.0,
+            fury: 0.0,
+            xp: 0,
+            level: 1,
+            kills: 0,
+            damage_done: 0.0,
+            weapon: WeaponKind::Repeater,
+            fire_timer: 0.0,
+            dash_timer: 0.0,
+            dash_time: 0.0,
+            invulnerable: 0.0,
+            nova_timer: 0.0,
+            overdrive: 0.0,
+            combo: 0,
+            combo_timer: 0.0,
+        }
     }
 }
 
@@ -119,7 +156,14 @@ pub struct Projectile {
 }
 
 #[derive(Clone, Debug)]
-pub struct Pickup { pub pos: Vec2, pub velocity: Vec2, pub kind: PickupKind, pub radius: f32, pub ttl: f32, pub spin: f32 }
+pub struct Pickup {
+    pub pos: Vec2,
+    pub velocity: Vec2,
+    pub kind: PickupKind,
+    pub radius: f32,
+    pub ttl: f32,
+    pub spin: f32,
+}
 
 #[derive(Clone, Debug)]
 pub struct Particle {
@@ -134,7 +178,14 @@ pub struct Particle {
 }
 
 #[derive(Clone, Debug)]
-pub struct FloatingText { pub pos: Vec2, pub text: String, pub color: Color, pub life: f32, pub max_life: f32, pub size: f32 }
+pub struct FloatingText {
+    pub pos: Vec2,
+    pub text: String,
+    pub color: Color,
+    pub life: f32,
+    pub max_life: f32,
+    pub size: f32,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SaveData {
@@ -147,8 +198,16 @@ pub struct SaveData {
 }
 
 impl Default for SaveData {
-    fn default() -> Self { Self { version: SAVE_VERSION, best_wave: 0, lifetime_kills: 0, lifetime_xp: 0,
-        unlocked_weapons: vec!["repeater".into()], volume: 0.75 } }
+    fn default() -> Self {
+        Self {
+            version: SAVE_VERSION,
+            best_wave: 0,
+            lifetime_kills: 0,
+            lifetime_xp: 0,
+            unlocked_weapons: vec!["repeater".into()],
+            volume: 0.75,
+        }
+    }
 }
 
 pub struct WorldState {
@@ -168,8 +227,23 @@ pub struct WorldState {
 }
 
 impl WorldState {
-    pub fn new(seed: u64) -> Self { Self { seed, time: 0.0, wave: 1, wave_progress: 0.0, spawn_budget: 3.0,
-        next_enemy_id: 1, kills_for_wave: 0, target_kills: 14, anomaly: 0.0, arena_radius: 1100.0, rift_event: None, rift_timer: 0.0, rift_cooldown: 18.0 } }
+    pub fn new(seed: u64) -> Self {
+        Self {
+            seed,
+            time: 0.0,
+            wave: 1,
+            wave_progress: 0.0,
+            spawn_budget: 3.0,
+            next_enemy_id: 1,
+            kills_for_wave: 0,
+            target_kills: 14,
+            anomaly: 0.0,
+            arena_radius: 1100.0,
+            rift_event: None,
+            rift_timer: 0.0,
+            rift_cooldown: 18.0,
+        }
+    }
 }
 
 pub struct GameData {

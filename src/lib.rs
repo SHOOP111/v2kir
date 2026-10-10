@@ -1,10 +1,10 @@
-pub mod constants;
-pub mod math;
-pub mod model;
 pub mod ai;
 pub mod combat;
-pub mod world;
+pub mod constants;
 pub mod game;
+pub mod math;
+pub mod model;
 pub mod render;
-pub mod ui;
 pub mod save;
+pub mod ui;
+pub mod world;
