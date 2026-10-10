@@ -21,7 +21,7 @@ mod constants {
 
     pub fn difficulty_wave(wave: u32) -> f32 {
         1.0 + wave.saturating_sub(1) as f32 * 0.075
-            + (wave / 8) as f32 .sqrt() * 0.18
+            + ((wave / 8) as f32).sqrt() * 0.18
     }
 
     pub fn xp_to_next(level: u32) -> u32 {
@@ -1352,7 +1352,6 @@ mod world {
         }
     }
 
-    use macroquad::rand::gen_range;
 }
 
 mod game {
@@ -1628,11 +1627,10 @@ mod game {
         game.texts.retain(|text| text.life > 0.0);
     }
 
-    use macroquad::rand::gen_range;
 }
 
 mod render {
-    use macroquad::{prelude::*, rand::gen_range};
+    use macroquad::prelude::*;
 
     use crate::{
         ai::enemy_color,
@@ -2201,7 +2199,7 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     use constants::FIXED_DT;
-    use game::GameData;
+    use model::GameData;
 
     let mut game = GameData::new();
     loop {
