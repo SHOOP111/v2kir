@@ -29,7 +29,7 @@ impl GameData {
         if is_mouse_button_down(MouseButton::Left){combat::fire_weapon(self,combat::player_aim(self));}
         let max_speed=if self.player.dash_time>0.0{DASH_SPEED}else{PLAYER_SPEED*(if self.player.overdrive>0.0{1.18}else{1.0})};let desired=input*max_speed;if self.player.dash_time<=0.0{self.player.velocity=damp(self.player.velocity,desired,16.0,dt);}self.player.pos+=self.player.velocity*dt;
         if self.player.velocity.length_squared()>30.0{self.player.combo_timer=self.player.combo_timer.max(0.0);}
-        self.player.energy=(self.player.energy+dt*11.0).min(self.player.max_energy);world::resolve_world_bounds(self);
+        let energy_regen = if self.world.rift_event == Some(RiftEvent::Overcharge) { 2.6 } else { 1.0 };self.player.energy=(self.player.energy+dt*11.0*energy_regen).min(self.player.max_energy);world::resolve_world_bounds(self);
         world::update_world(self,dt);crate::ai::update_enemies(self,dt);combat::update_projectiles(self,dt);combat::update_pickups(self,dt);update_fx(self,dt);
         if self.player.nova_timer<=0.0 && self.player.fury>90.0{self.banner="FURY PRIMED // [E] OVERDRIVE".into();self.banner_timer=self.banner_timer.max(0.1);}
         if self.elapsed>1.0 && self.elapsed%2.5<dt {save::store(&self.save);}
