@@ -11,6 +11,42 @@ pub enum EnemyKind { Grunt, Shooter, Dasher, Brute, Warden, Harvester }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WeaponKind { Dawnblade, Repeater, ArcCannon, VoidLance }
 
+/// Temporary world-scale modifiers that make each run feel less predictable.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RiftEvent {
+    BloodMoon,
+    Overcharge,
+    TimeSnare,
+    FortuneFlux,
+}
+
+impl RiftEvent {
+    pub const ALL: [Self; 4] = [
+        Self::BloodMoon,
+        Self::Overcharge,
+        Self::TimeSnare,
+        Self::FortuneFlux,
+    ];
+
+    pub fn title(self) -> &'static str {
+        match self {
+            Self::BloodMoon => "BLOOD MOON",
+            Self::Overcharge => "OVERCHARGE",
+            Self::TimeSnare => "TIME SNARE",
+            Self::FortuneFlux => "FORTUNE FLUX",
+        }
+    }
+
+    pub fn description(self) -> &'static str {
+        match self {
+            Self::BloodMoon => "Enemies hit harder",
+            Self::Overcharge => "More energy + weapon damage",
+            Self::TimeSnare => "Enemies move slower",
+            Self::FortuneFlux => "Enemies drop more loot",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PickupKind { Heal, Energy, Xp, Fury }
 
@@ -126,11 +162,14 @@ pub struct WorldState {
     pub target_kills: u32,
     pub anomaly: f32,
     pub arena_radius: f32,
+    pub rift_event: Option<RiftEvent>,
+    pub rift_timer: f32,
+    pub rift_cooldown: f32,
 }
 
 impl WorldState {
     pub fn new(seed: u64) -> Self { Self { seed, time: 0.0, wave: 1, wave_progress: 0.0, spawn_budget: 3.0,
-        next_enemy_id: 1, kills_for_wave: 0, target_kills: 14, anomaly: 0.0, arena_radius: 1100.0 } }
+        next_enemy_id: 1, kills_for_wave: 0, target_kills: 14, anomaly: 0.0, arena_radius: 1100.0, rift_event: None, rift_timer: 0.0, rift_cooldown: 18.0 } }
 }
 
 pub struct GameData {
