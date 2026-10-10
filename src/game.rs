@@ -75,7 +75,7 @@ impl GameData {
             self.player.dash_time = 0.14;
             self.player.dash_timer = 0.95;
             self.player.invulnerable = 0.22;
-            combat::burst(self, self.player.pos, SKYBLUE, 24, 300.0, 0.28);
+            crate::ai::burst(self, self.player.pos, SKYBLUE, 24, 300.0, 0.28);
             self.shake = self.shake.max(0.35);
         }
         if is_key_pressed(KeyCode::Q) && self.player.nova_timer <= 0.0 && self.player.energy >= 45.0
@@ -89,7 +89,7 @@ impl GameData {
                     e.stun = 0.6;
                 }
             }
-            combat::burst(self, self.player.pos, VIOLET, 70, 420.0, 0.65);
+            crate::ai::burst(self, self.player.pos, VIOLET, 70, 420.0, 0.65);
             self.shake = self.shake.max(0.8);
         }
         if is_key_pressed(KeyCode::E) && self.player.fury >= 100.0 {
@@ -97,7 +97,7 @@ impl GameData {
             self.player.overdrive = 8.0;
             self.banner = "OVERDRIVE // TIME TO BREAK THE HORDE".into();
             self.banner_timer = 1.8;
-            combat::burst(self, self.player.pos, GOLD, 35, 260.0, 0.45);
+            crate::ai::burst(self, self.player.pos, GOLD, 35, 260.0, 0.45);
         }
         if is_mouse_button_down(MouseButton::Left) {
             combat::fire_weapon(self, combat::player_aim(self));
