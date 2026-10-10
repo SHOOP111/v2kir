@@ -1,4 +1,4 @@
-use aetherfall::{constants::FIXED_DT, game::GameData, render, ui};
+use aetherfall::{constants::FIXED_DT, game, model::GameData, render, ui};
 use macroquad::prelude::*;
 
 fn window_conf() -> Conf {
