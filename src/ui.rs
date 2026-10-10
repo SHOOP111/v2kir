@@ -14,6 +14,22 @@ pub fn draw_hud(game:&GameData){
     let right_x=w-250.0;draw_panel(right_x,18.0,232.0,76.0,Color::new(0.02,0.035,0.06,0.78));draw_text(&format!("SCORE {:09}",game.score),right_x+14.0,42.0,18.0,GOLD);draw_text(&format!("KILLS {:05}",game.player.kills),right_x+14.0,66.0,16.0,WHITE);
     draw_text(&format!("DMG {:.0}",game.player.damage_done),right_x+122.0,66.0,14.0,SKYBLUE);
 
+    let event_x = (w - 344.0) * 0.5;
+    draw_panel(event_x, 18.0, 326.0, 68.0, Color::new(0.02, 0.035, 0.06, 0.82));
+    let (event_title, event_color, event_status) = if let Some(event) = game.world.rift_event {
+        (event.title(), match event {
+            RiftEvent::BloodMoon => RED,
+            RiftEvent::Overcharge => SKYBLUE,
+            RiftEvent::TimeSnare => VIOLET,
+            RiftEvent::FortuneFlux => GOLD,
+        }, format!("{}  //  {:.1}s", event.description(), game.world.rift_timer))
+    } else {
+        ("RIFT // DORMANT", Color::new(0.42, 0.50, 0.62, 1.0), format!("NEXT EVENT IN {:.0}s", game.world.rift_cooldown))
+    };
+    let title = format!("RIFT // {}", event_title);
+    draw_text(&title, event_x + 14.0, 43.0, 17.0, event_color);
+    draw_text(&event_status, event_x + 14.0, 67.0, 13.0, WHITE);
+
     let weapon=match game.player.weapon{WeaponKind::Dawnblade=>"DAWNBLADE",WeaponKind::Repeater=>"REPEATER",WeaponKind::ArcCannon=>"ARC CANNON",WeaponKind::VoidLance=>"VOID LANCE"};
     let wm=measure_text(weapon,None,17,1.0);draw_text(weapon,w*0.5-wm.width*0.5,h-42.0,17.0,WHITE);
     if game.player.overdrive>0.0{let t=measure_text("OVERDRIVE",None,18,1.0);draw_text("OVERDRIVE",w*0.5-t.width*0.5,122.0,18.0,GOLD);}
