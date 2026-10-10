@@ -6,6 +6,8 @@ A large-scale Rust action game prototype built around a deterministic simulation
 
 Aetherfall is a top-down action roguelite with RPG progression, elite enemies, reactive encounters, procedural arenas, and a deliberately modular codebase. The goal is not a disposable demo: systems are separated so new weapons, enemies, abilities, biomes, and game modes can be added without rewriting the simulation.
 
+- **Rift Events:** periodic 12-second world modifiers. Blood Moon raises enemy damage, Overcharge amplifies player energy regeneration and weapon damage, Time Snare slows enemies, and Fortune Flux improves loot drops. The HUD announces the active event and its remaining time, with a matching ambient color wash.
+
 ## Current architecture
 
 - `game`: fixed-step simulation, run state, clocks, difficulty scaling
