@@ -36,4 +36,49 @@ pub fn update_projectiles(game:&mut GameData,dt:f32){
 fn enemy_tint(k:EnemyKind)->Color{match k{EnemyKind::Grunt=>RED,EnemyKind::Shooter=>VIOLET,EnemyKind::Dasher=>ORANGE,EnemyKind::Brute=>MAROON,EnemyKind::Warden=>SKYBLUE,EnemyKind::Harvester=>YELLOW}}
 fn kill_enemy(game:&mut GameData,e:Enemy){game.player.kills+=1;game.player.combo=game.player.combo.saturating_add(1);game.player.combo_timer=2.2;game.world.kills_for_wave+=1;game.save.lifetime_kills+=1;let xp=(14.0+e.max_hp*0.17)*(if e.elite{2.8}else{1.0})*(1.0+game.world.wave as f32*0.016);grant_xp(game,xp as u32);game.score=game.score.saturating_add((e.max_hp as u64)*if e.elite{7}else{1});burst(game,e.pos,enemy_tint(e.kind),if e.elite{38}else{18},if e.elite{340.0}else{210.0},if e.elite{0.55}else{0.34});if e.elite||gen_range(0.0_f32,100.0)<8.0+game.world.anomaly*12.0{let kind=if game.player.hp<55.0&&gen_range(0,2)==0{PickupKind::Heal}else if gen_range(0,3)==0{PickupKind::Fury}else{PickupKind::Energy};game.pickups.push(Pickup{pos:e.pos,velocity:Vec2::ZERO,kind,radius:12.0,ttl:18.0,spin:0.0});}if gen_range(0.0_f32,100.0)<4.5{game.pickups.push(Pickup{pos:e.pos+vec2(gen_range(-8.0,8.0),gen_range(-8.0,8.0)),velocity:Vec2::ZERO,kind:PickupKind::Xp,radius:9.0,ttl:25.0,spin:0.0});}}
 fn grant_xp(game:&mut GameData,xp:u32){game.player.xp=game.player.xp.saturating_add(xp);game.save.lifetime_xp+=xp as u64;loop{let req=xp_to_next(game.player.level);if game.player.xp<req{break;}game.player.xp-=req;game.player.level+=1;game.player.max_hp+=8.0;game.player.max_energy+=4.0;game.player.hp=game.player.max_hp;game.player.energy=game.player.max_energy;game.banner=format!("LEVEL {} // POWER ASCENDED",game.player.level);game.banner_timer=1.8;game.shake=0.45;}}
-pub fn update_pickups(game:&mut GameData,dt:f32){for p in &mut game.pickups{p.ttl-=dt;p.spin+=dt*3.2;if game.player.pos.distance(p.pos)<170.0{p.velocity=damp(p.velocity,safe_normalize(game.player.pos-p.pos)*260.0,7.0,dt);}p.pos+=p.velocity*dt;}let mut remove=Vec::new();for(i,p)in game.pickups.iter().enumerate(){if p.ttl<=0.0{remove.push(i);continue;}if p.pos.distance(game.player.pos)<p.radius+game.player.radius{match p.kind{PickupKind::Heal=>game.player.hp=(game.player.hp+28.0).min(game.player.max_hp),PickupKind::Energy=>game.player.energy=(game.player.energy+35.0).min(game.player.max_energy),PickupKind::Fury=>game.player.fury=(game.player.fury+30.0).min(100.0),PickupKind::Xp=>grant_xp(game,44)}burst(game,p.pos,match p.kind{PickupKind::Heal=>GREEN,PickupKind::Energy=>SKYBLUE,PickupKind::Fury=>ORANGE,PickupKind::Xp=>GOLD},12,130.0,0.22);remove.push(i);}}for i in remove.into_iter().rev(){if i<game.pickups.len(){game.pickups.swap_remove(i);}}}
+pub fn update_pickups(game: &mut GameData, dt: f32) {
+    for pickup in &mut game.pickups {
+        pickup.ttl -= dt;
+        pickup.spin += dt * 3.2;
+        if game.player.pos.distance(pickup.pos) < 170.0 {
+            let direction = safe_normalize(game.player.pos - pickup.pos);
+            pickup.velocity = damp(pickup.velocity, direction * 260.0, 7.0, dt);
+        }
+        pickup.pos += pickup.velocity * dt;
+    }
+
+    let mut remove = Vec::new();
+    let mut collected = Vec::new();
+    for (index, pickup) in game.pickups.iter().enumerate() {
+        if pickup.ttl <= 0.0 {
+            remove.push(index);
+        } else if pickup.pos.distance(game.player.pos) < pickup.radius + game.player.radius {
+            remove.push(index);
+            collected.push((pickup.kind, pickup.pos));
+        }
+    }
+
+    for (kind, position) in collected {
+        match kind {
+            PickupKind::Heal => game.player.hp = (game.player.hp + 28.0).min(game.player.max_hp),
+            PickupKind::Energy => {
+                game.player.energy = (game.player.energy + 35.0).min(game.player.max_energy)
+            }
+            PickupKind::Fury => game.player.fury = (game.player.fury + 30.0).min(100.0),
+            PickupKind::Xp => grant_xp(game, 44),
+        }
+        let color = match kind {
+            PickupKind::Heal => GREEN,
+            PickupKind::Energy => SKYBLUE,
+            PickupKind::Fury => ORANGE,
+            PickupKind::Xp => GOLD,
+        };
+        burst(game, position, color, 12, 130.0, 0.22);
+    }
+
+    for index in remove.into_iter().rev() {
+        if index < game.pickups.len() {
+            game.pickups.swap_remove(index);
+        }
+    }
+}
