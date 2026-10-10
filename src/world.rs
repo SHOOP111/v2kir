@@ -53,6 +53,28 @@ pub fn update_world(game: &mut GameData, dt: f32) {
     game.near_miss = (game.near_miss - dt * 2.0).max(0.0);
     game.banner_timer = (game.banner_timer - dt).max(0.0);
 
+    // Rift events create short, readable changes in the combat rules.
+    if let Some(active) = game.world.rift_event {
+        game.world.rift_timer = (game.world.rift_timer - dt).max(0.0);
+        if game.world.rift_timer <= 0.0 {
+            game.world.rift_event = None;
+            game.world.rift_cooldown = 14.0;
+            game.banner = format!("RIFT STABILIZED // {}", active.title());
+            game.banner_timer = 2.0;
+        }
+    } else {
+        game.world.rift_cooldown = (game.world.rift_cooldown - dt).max(0.0);
+        if game.world.rift_cooldown <= 0.0 {
+            let index = gen_range(0_i32, RiftEvent::ALL.len() as i32) as usize;
+            let event = RiftEvent::ALL[index];
+            game.world.rift_event = Some(event);
+            game.world.rift_timer = 12.0;
+            game.banner = format!("RIFT EVENT // {}", event.title());
+            game.banner_timer = 2.8;
+            game.shake = game.shake.max(0.35);
+        }
+    }
+
     game.world.spawn_budget += dt * (0.62 + game.world.wave as f32 * 0.027);
     let alive_pressure = game.enemies.len() as f32 / 65.0;
     if game.world.spawn_budget > 1.0 && alive_pressure < 1.0 {
