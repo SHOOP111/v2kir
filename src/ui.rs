@@ -14,7 +14,7 @@ pub fn draw_hud(game:&GameData){
     let right_x=w-250.0;draw_panel(right_x,18.0,232.0,76.0,Color::new(0.02,0.035,0.06,0.78));draw_text(&format!("SCORE {:09}",game.score),right_x+14.0,42.0,18.0,GOLD);draw_text(&format!("KILLS {:05}",game.player.kills),right_x+14.0,66.0,16.0,WHITE);
     draw_text(&format!("DMG {:.0}",game.player.damage_done),right_x+122.0,66.0,14.0,SKYBLUE);
 
-    let event_x = (w - 344.0) * 0.5;
+    let event_x = (w - 326.0) * 0.5;
     draw_panel(event_x, 18.0, 326.0, 68.0, Color::new(0.02, 0.035, 0.06, 0.82));
     let (event_title, event_color, event_status) = if let Some(event) = game.world.rift_event {
         (event.title(), match event {
@@ -24,7 +24,7 @@ pub fn draw_hud(game:&GameData){
             RiftEvent::FortuneFlux => GOLD,
         }, format!("{}  //  {:.1}s", event.description(), game.world.rift_timer))
     } else {
-        ("RIFT // DORMANT", Color::new(0.42, 0.50, 0.62, 1.0), format!("NEXT EVENT IN {:.0}s", game.world.rift_cooldown))
+        ("DORMANT", Color::new(0.42, 0.50, 0.62, 1.0), format!("NEXT EVENT IN {:.0}s", game.world.rift_cooldown))
     };
     let title = format!("RIFT // {}", event_title);
     draw_text(&title, event_x + 14.0, 43.0, 17.0, event_color);
