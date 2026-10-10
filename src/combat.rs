@@ -273,50 +273,58 @@ fn grant_xp(game: &mut GameData, xp: u32) {
     }
 }
 pub fn update_pickups(game: &mut GameData, dt: f32) {
-    for p in &mut game.pickups {
-        p.ttl -= dt;
-        p.spin += dt * 3.2;
-        if game.player.pos.distance(p.pos) < 170.0 {
-            p.velocity = damp(p.velocity, safe_normalize(game.player.pos - p.pos) * 260.0, 7.0, dt);
+    for pickup in &mut game.pickups {
+        pickup.ttl -= dt;
+        pickup.spin += dt * 3.2;
+        if game.player.pos.distance(pickup.pos) < 170.0 {
+            pickup.velocity = damp(
+                pickup.velocity,
+                safe_normalize(game.player.pos - pickup.pos) * 260.0,
+                7.0,
+                dt,
+            );
         }
-        p.pos += p.velocity * dt;
+        pickup.pos += pickup.velocity * dt;
     }
+
+    // First collect collision results without mutating GameData, avoiding a
+    // shared borrow while XP grants and particle effects need mutable access.
     let mut remove = Vec::new();
-    for (i, p) in game.pickups.iter().enumerate() {
-        if p.ttl <= 0.0 {
-            remove.push(i);
+    let mut collected = Vec::new();
+    for (index, pickup) in game.pickups.iter().enumerate() {
+        if pickup.ttl <= 0.0 {
+            remove.push(index);
             continue;
         }
-        if p.pos.distance(game.player.pos) < p.radius + game.player.radius {
-            match p.kind {
-                PickupKind::Heal => {
-                    game.player.hp = (game.player.hp + 28.0).min(game.player.max_hp)
-                }
-                PickupKind::Energy => {
-                    game.player.energy = (game.player.energy + 35.0).min(game.player.max_energy)
-                }
-                PickupKind::Fury => game.player.fury = (game.player.fury + 30.0).min(100.0),
-                PickupKind::Xp => grant_xp(game, 44),
-            }
-            burst(
-                game,
-                p.pos,
-                match p.kind {
-                    PickupKind::Heal => GREEN,
-                    PickupKind::Energy => SKYBLUE,
-                    PickupKind::Fury => ORANGE,
-                    PickupKind::Xp => GOLD,
-                },
-                12,
-                130.0,
-                0.22,
-            );
-            remove.push(i);
+        if pickup.pos.distance(game.player.pos) < pickup.radius + game.player.radius {
+            remove.push(index);
+            collected.push((pickup.pos, pickup.kind));
         }
     }
-    for i in remove.into_iter().rev() {
-        if i < game.pickups.len() {
-            game.pickups.swap_remove(i);
+
+    for (pos, kind) in collected {
+        match kind {
+            PickupKind::Heal => game.player.hp = (game.player.hp + 28.0).min(game.player.max_hp),
+            PickupKind::Energy => {
+                game.player.energy = (game.player.energy + 35.0).min(game.player.max_energy)
+            }
+            PickupKind::Fury => game.player.fury = (game.player.fury + 30.0).min(100.0),
+            PickupKind::Xp => grant_xp(game, 44),
+        }
+        let color = match kind {
+            PickupKind::Heal => GREEN,
+            PickupKind::Energy => SKYBLUE,
+            PickupKind::Fury => ORANGE,
+            PickupKind::Xp => GOLD,
+        };
+        burst(game, pos, color, 12, 130.0, 0.22);
+    }
+
+    remove.sort_unstable();
+    remove.dedup();
+    for index in remove.into_iter().rev() {
+        if index < game.pickups.len() {
+            game.pickups.swap_remove(index);
         }
     }
 }
